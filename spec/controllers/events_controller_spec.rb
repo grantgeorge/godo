@@ -69,4 +69,42 @@ describe EventsController do
     end
   end
 
+  describe "create" do
+    before do
+      xhr :post, :create, format: :json, event: { name: "Exploring Jupiter",
+        description: "A pretty good time!" }
+    end
+    it { expect(response.status).to eq(201) }
+    it { expect(Event.last.name).to eq("Exploring Jupiter") }
+    it { expect(Event.last.description).to eq("A pretty good time!")}
+  end
+
+  describe "update" do
+    let(:event) {
+      Event.create!(name: 'Skydiving w/ Friends',
+        description: "Skydiving lez go!")
+    }
+    before do
+      xhr :put, :update, format: :json, id: event.id, event: { name: "Teleporting",
+        description: "Teleport to a different world"}
+
+      event.reload
+    end
+    it { expect(response.status).to eq(204) }
+    it { expect(event.name).to eq("Teleporting") }
+    it { expect(event.description).to eq("Teleport to a different world") }
+  end
+
+  describe "destroy" do
+    let(:event_id) {
+      Event.create!(name: 'Skydiving w/ Friends',
+        description: "Skydiving lez go!")
+    }
+    before do
+      xhr :delete, :destroy, format: :json, id: event_id
+    end
+    it { expect(response.status).to eq(204) }
+    it { expect(Event.find_by_id(event_id)).to be_nil }
+  end
+
 end
